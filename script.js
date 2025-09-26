@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
       answer_e_correct: "false",
       answer_f_correct: "false"
     },
-    correct_answer: "answer_c",
+    correct_answer: "console.log('Hello World');",
     explanation: "In JavaScript, the correct way to print to the console is using console.log().",
     tip: null,
     tags: [{ name: "JavaScript" }],
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
       answer_e_correct: "false",
       answer_f_correct: "false"
     },
-    correct_answer: "answer_b",
+    correct_answer: "<script>",
     explanation: "The <script> tag is used to include JavaScript files in HTML.",
     tip: null,
     tags: [{ name: "HTML" }],
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
       answer_e_correct: "false",
       answer_f_correct: "false"
     },
-    correct_answer: "answer_a",
+    correct_answer: "Math.round()",
     explanation: "Math.round() returns the value of a number rounded to the nearest integer.",
     tip: null,
     tags: [{ name: "JavaScript" }],
@@ -90,8 +90,11 @@ document.addEventListener("DOMContentLoaded",async()=>{
     let option=document.querySelector(".options");
     let ques=document.querySelector(".question");
     let jawab=document.querySelectorAll(".opt");
-    
+    let selectedOption = document.querySelector(".opt.selected");
+    let score=0;
     let data=mockData;
+    let selectedAnswerText = "";
+    let isAnswered=false;
     console.log(data);
     function selectOption(){
         jawab.classList.toggle("selected");
@@ -103,7 +106,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
         ques.textContent=questions;
 
         let ans=data[index].answers;
-        
+        let finalAns=data[index].correct_answer;
         for(let key in ans){
             if(ans[key]){
                 let newElem=document.createElement("p");
@@ -112,6 +115,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
                 option.appendChild(newElem);
                 newElem.addEventListener("click", () => {
                     // Remove selection from all options
+                    if (isAnswered) return; // 🔒 prevent further clicks
+                    isAnswered = true;
                     document.querySelectorAll(".opt").forEach((opt) => {
                         opt.classList.remove("selected");
                     });
@@ -120,10 +125,26 @@ document.addEventListener("DOMContentLoaded",async()=>{
                     newElem.classList.add("selected");
 
                     // Store selected key globally if needed
-                    selectedAnswer = key;
+                    selectedAnswerText=newElem.textContent;
+                    console.log(selectedAnswerText);
+                    if(selectedAnswerText===finalAns){
+                        score+=1;
+                        newElem.classList.remove("selected");
+                        newElem.classList.add("correct");
+                    }
+                    else{
+                        newElem.classList.add("wrong");
+                        document.querySelectorAll(".opt").forEach(opt=>{
+                            if(opt.textContent===finalAns){
+                                opt.classList.add("correct");
+                            }
+                        })
+                    }
                 });
             }
         }
+
+        
         
 
         
@@ -133,13 +154,16 @@ document.addEventListener("DOMContentLoaded",async()=>{
     renderQuestion(currentIndex);
 
     submit.addEventListener("click",()=>{
+        isAnswered=false;
         option.innerHTML="";
         currentIndex++;
         if(currentIndex<mockData.length){
             renderQuestion(currentIndex);
         }
         else{
-            ques.textContent="Quiz ended!"
+            ques.textContent=`Quiz ended! \n            You scored ${score} out of 3`;
+            console.log(score);
+            
         }
     })
 
